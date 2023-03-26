@@ -34,7 +34,69 @@ export class AppService {
       };
     } catch (error) {
       // 🚨 Melemparkan error jika terjadi kesalahan
-      throw error;
+      console.log('error 2', error);
+      // throw error;
+    }
+  }
+
+  async getChatCompletion({ res, prompt }: { res: Response; prompt: string }) {
+    try {
+      const response = await this.openai.createChatCompletion(
+        {
+          model: 'gpt-3.5-turbo',
+          messages: [
+            { role: 'system', content: 'You are a helpful assistant.' },
+            { role: 'user', content: 'Who won the world series in 2020?' },
+            {
+              role: 'assistant',
+              content: 'The Los Angeles Dodgers won the World Series in 2020.',
+            },
+            { role: 'user', content: 'Where was it played?' },
+          ],
+          max_tokens: 4000,
+          temperature: 0.9,
+          stream: true,
+        },
+        { responseType: 'stream' },
+      );
+
+      // Mengambil stream dari API OpenAI
+      const stream = response.data as any as Readable;
+      stream
+        .on('data', (chunk) => {
+          try {
+            // Mendapatkan hasil dari setiap chunk data yang diterima dari stream
+            const data =
+              JSON.parse(chunk?.toString()?.trim()?.replace('data: ', '')) ??
+              {};
+
+            // Mengirim data ke client
+            // Menggunakan metode flush() untuk memastikan bahwa respon sudah dikirimkan ke client
+            (res as any).flush(data.choices?.[0]?.text);
+          } catch (error) {
+            console.log('Skipable error');
+          }
+        })
+        // Mengalirkan data dari stream ke respon yang diberikan
+        .pipe(res);
+
+      // Mengakhiri respon saat stream berakhir
+      stream.on('end', () => {
+        res.end();
+      });
+
+      // Menangani kesalahan yang terjadi pada stream
+      stream.on('error', (error) => {
+        console.error(error);
+        res.end(
+          JSON.stringify({
+            error: true,
+            message: 'Error generating response.',
+          }),
+        );
+      });
+    } catch (error) {
+      console.log('error', error);
     }
   }
 

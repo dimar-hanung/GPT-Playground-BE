@@ -35,7 +35,8 @@ buat dengan bahasa non formal dan asik.`,
           res.send({ text: response.data?.trim() ?? '' });
         });
     } catch (error) {
-      throw error;
+      console.log('error', error);
+      // throw error;
     }
   }
 
