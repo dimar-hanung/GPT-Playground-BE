@@ -71,4 +71,19 @@ buat dengan bahasa non formal dan asik.`,
       console.log('error', error);
     }
   }
+
+  @Post('chat')
+  async gptChat(@Res() res: Response, @Req() { body }: { body: any }) {
+    try {
+      this.appService.getChatCompletion({
+        res,
+        prompt: `Buat 1 kalimat hiburan lucu untuk programmer.
+      buat dengan bahasa non formal dan asik.
+      `,
+      });
+      // return completion.data;
+    } catch (error) {
+      console.log('error', error);
+    }
+  }
 }
