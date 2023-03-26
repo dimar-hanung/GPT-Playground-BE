@@ -35,7 +35,8 @@ buat dengan bahasa non formal dan asik.`,
           res.send({ text: response.data?.trim() ?? '' });
         });
     } catch (error) {
-      throw error;
+      console.log('error', error);
+      // throw error;
     }
   }
 
@@ -60,6 +61,39 @@ buat dengan bahasa non formal dan asik.`,
   async gptQuote(@Res() res: Response, @Req() { body }: { body: any }) {
     try {
       this.appService.getCompletionStream({
+        res,
+        prompt: `Buat 1 kalimat hiburan lucu untuk programmer.
+      buat dengan bahasa non formal dan asik.
+      `,
+      });
+      // return completion.data;
+    } catch (error) {
+      console.log('error', error);
+    }
+  }
+
+  @Post('gpt-puisi')
+  async gptPuisi(@Res() res: Response, @Req() { body }: { body: any }) {
+    try {
+      this.appService.getCompletionStream({
+        res,
+        prompt: `Web GPT Playground ini dibuat dengan Vue 3, Nest JS, Open AI.
+        ini berisi hello-world dan study case untuk integrasi dengan gpt dari openai.
+        Tujuan nya untuk mempermudah untuk mempelajari gpt dengan praktik langsung.
+
+        tolong jelaskan dalam bentuk puisi. gunakan bahasa anak senja
+      `,
+      });
+      // return completion.data;
+    } catch (error) {
+      console.log('error', error);
+    }
+  }
+
+  @Post('chat')
+  async gptChat(@Res() res: Response, @Req() { body }: { body: any }) {
+    try {
+      this.appService.getChatCompletion({
         res,
         prompt: `Buat 1 kalimat hiburan lucu untuk programmer.
       buat dengan bahasa non formal dan asik.
