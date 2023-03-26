@@ -2,6 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { Configuration, OpenAIApi } from 'openai';
 import { Readable } from 'stream';
 import { Response } from 'express';
+import { InjectModel } from '@nestjs/mongoose';
+import { ChatHistory, ChatHistoryDocument } from './chat.schema';
+import mongoose, { Model } from 'mongoose';
 @Injectable()
 export class AppService {
   // 🚀 Mendefinisikan konfigurasi untuk koneksi ke API OpenAI
@@ -12,7 +15,12 @@ export class AppService {
   // 🤖 Membuat objek OpenAIApi dengan menggunakan konfigurasi yang telah dibuat
   private openai = new OpenAIApi(this.configuration);
 
-  constructor() {}
+  constructor(
+    @InjectModel(ChatHistory.name)
+    private chatHistoryModel: Model<ChatHistoryDocument>,
+  ) {
+    console.log('ChatHistory.name', ChatHistory.name);
+  }
 
   getHello(): string {
     return 'Hello World! Dimar !';
@@ -41,6 +49,8 @@ export class AppService {
 
   async getChatCompletion({ res, prompt }: { res: Response; prompt: string }) {
     try {
+      // insert chat history
+
       const response = await this.openai.createChatCompletion(
         {
           model: 'gpt-3.5-turbo',
@@ -62,19 +72,28 @@ export class AppService {
 
       // Mengambil stream dari API OpenAI
       const stream = response.data as any as Readable;
+      const message = [];
       stream
-        .on('data', (chunk) => {
+        .on('data', async (chunk) => {
           try {
             // Mendapatkan hasil dari setiap chunk data yang diterima dari stream
-            const data =
-              JSON.parse(chunk?.toString()?.trim()?.replace('data: ', '')) ??
-              {};
+            const decoder = new TextDecoder('utf-8');
+            const res = decoder.decode(chunk);
+            const parsed =
+              JSON.parse(res?.toString()?.trim()?.replace('data: ', '')) ?? {};
 
             // Mengirim data ke client
             // Menggunakan metode flush() untuk memastikan bahwa respon sudah dikirimkan ke client
-            (res as any).flush(data.choices?.[0]?.text);
+
+            message.push(parsed.choices?.[0]?.delta?.content as string);
           } catch (error) {
-            console.log('Skipable error');
+            console.log('Skipable error', message.join(''));
+            const chatHistory = new this.chatHistoryModel({
+              chatId: Math.random().toString(),
+              message: message.join(''),
+              role: 'user',
+            });
+            const x = await chatHistory.save();
           }
         })
         // Mengalirkan data dari stream ke respon yang diberikan

@@ -1,0 +1,23 @@
+{
+  "_id": "5a6c5b0b4b6e9a0014c7b0a6",
+  "username": "test",
+  "password": "test",
+  "email": "example@gmail.com",
+  "chat_title": [
+    {
+      "user_id": "5a6c5b0b4b6e9a0014c7b0a6",
+      "id": "5a6c5b0b4b6e9a0014c7b0a6",
+      "title": "test",
+      "time": "2018-01-25T15:00:00.000Z",
+      "chat_conversation": [
+        {
+          "chat_title_id": "5a6c5b0b4b6e9a0014c7b0a6",
+          "id": "5a6c5b0b4b6e9a0014c7b0a6",
+          "name": "test",
+          "message": "test",
+          "time": "2018-01-25T15:00:00.000Z"
+        }
+      ]
+    }
+  ]
+}

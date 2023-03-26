@@ -72,6 +72,24 @@ buat dengan bahasa non formal dan asik.`,
     }
   }
 
+  @Post('gpt-puisi')
+  async gptPuisi(@Res() res: Response, @Req() { body }: { body: any }) {
+    try {
+      this.appService.getCompletionStream({
+        res,
+        prompt: `Web GPT Playground ini dibuat dengan Vue 3, Nest JS, Open AI.
+        ini berisi hello-world dan study case untuk integrasi dengan gpt dari openai.
+        Tujuan nya untuk mempermudah untuk mempelajari gpt dengan praktik langsung.
+
+        tolong jelaskan dalam bentuk puisi. gunakan bahasa anak senja
+      `,
+      });
+      // return completion.data;
+    } catch (error) {
+      console.log('error', error);
+    }
+  }
+
   @Post('chat')
   async gptChat(@Res() res: Response, @Req() { body }: { body: any }) {
     try {
