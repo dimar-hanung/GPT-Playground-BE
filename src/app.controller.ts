@@ -57,6 +57,19 @@ buat dengan bahasa non formal dan asik.`,
       });
   }
 
+  @Post('gpt-stream')
+  async gptStream(@Res() res: Response, @Req() { body }: { body: any }) {
+    try {
+      this.appService.getCompletionStream({
+        res,
+        prompt: body?.prompt,
+      });
+    } catch (error) {
+      console.log('error', error);
+      res.send({ error });
+    }
+  }
+
   @Post('gpt-quote')
   async gptQuote(@Res() res: Response, @Req() { body }: { body: any }) {
     try {
